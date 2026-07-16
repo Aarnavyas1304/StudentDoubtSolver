@@ -1,0 +1,93 @@
+﻿@model IEnumerable<StudentDoubtSolver.Models.Question>
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<style>
+    body { background-color: #f8faff; font-family: 'Poppins', sans-serif; }
+
+    /* TOP NAV BAR GRADIENT */
+    .custom-navbar {
+        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 30%, #702082 70%, #a31a7e 100%);
+        padding: 15px 40px;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .search-bar {
+        width: 450px; height: 45px; border-radius: 10px; border: none;
+        padding-left: 45px; background: rgba(255, 255, 255, 0.9);
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gray" class="bi bi-search" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>');
+        background-repeat: no-repeat; background-position: 15px center;
+    }
+
+    /* FLOATING BUBBLE BUTTON */
+    .post-btn {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white; border: none; border-radius: 50px;
+        padding: 12px 35px; font-weight: 600; font-size: 1.1rem;
+        box-shadow: 0 10px 25px rgba(37, 117, 252, 0.4);
+        transition: 0.3s; margin-top: 30px; margin-right: 40px;
+    }
+    .post-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(37, 117, 252, 0.5); color: white; }
+
+    /* BUBBLY CARDS */
+    .question-card {
+        background: white; border: none; border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        transition: 0.3s; height: 100%; padding: 25px;
+    }
+    .question-card:hover { transform: scale(1.02); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+
+    .tag-badge {
+        background-color: #e9ecef; color: #6c757d;
+        font-size: 0.8rem; border-radius: 50px; padding: 5px 15px; margin-right: 5px;
+    }
+
+    .stat-box { text-align: center; font-size: 0.9rem; color: #333; }
+    .stat-val { font-weight: 800; font-size: 1.2rem; display: block; }
+    .logout-btn { background: rgba(255,255,255,0.1); border: 1.5px solid white; border-radius: 8px; color: white; padding: 5px 15px; }
+</style>
+
+<div class="custom-navbar">
+    <div class="d-flex align-items-center">
+        <img src="https://cdn-icons-png.flaticon.com/512/3222/3222165.png" height="35" style="filter: invert(1);">
+    </div>
+    <input type="text" class="search-bar" placeholder="Search">
+    <div class="d-flex align-items-center">
+        <i class="bi bi-person-circle text-white fs-2 me-3"></i>
+        <a asp-controller="Account" asp-action="Logout" class="logout-btn text-decoration-none">Logout</a>
+    </div>
+</div>
+
+<div class="container mt-2">
+    <div class="text-end">
+        <a asp-action="Create" class="btn post-btn">Post a Question</a>
+    </div>
+
+    <div class="row mt-5">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <a href="/Question/ProvideSolution/@item.Id" class="text-decoration-none">
+                    <div class="question-card">
+                        <h5 class="fw-bold text-dark mb-3">@item.Title</h5>
+                        <div class="mb-4">
+                            <span class="tag-badge">Math</span>
+                            <span class="tag-badge">Physics</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div class="stat-box">
+                                <span class="stat-val">@(item.Answers?.Count ?? 0)</span> Votes
+                            </div>
+                            <div class="stat-box text-end">
+                                <span class="stat-val">50</span> Reputation
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>

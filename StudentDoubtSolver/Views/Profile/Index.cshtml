@@ -1,0 +1,276 @@
+﻿@model StudentDoubtSolver.ViewModels.ProfileViewModel
+@using Microsoft.AspNetCore.Http
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Model.UserName | Profile</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --login-grad: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #702082 100%);
+            --glass: rgba(255, 255, 255, 0.95);
+            --header-dark: rgba(30, 60, 114, 0.98);
+        }
+
+        body { 
+            background: radial-gradient(circle at top left, #fdfcfb 0%, #e2d1c3 100%);
+            font-family: 'Poppins', sans-serif; 
+            margin: 0;
+            padding-top: 120px; 
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .floating-nav {
+            background: var(--header-dark);
+            backdrop-filter: blur(20px);
+            height: 85px; width: 92%; position: fixed; top: 15px; left: 4%;
+            border-radius: 50px; z-index: 1000; display: flex; align-items: center; 
+            justify-content: space-between; padding: 0 35px;
+            box-shadow: 0 15px 35px rgba(30, 60, 114, 0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .profile-container {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 50px;
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+            max-width: 1000px;
+            margin: 40px auto;
+            position: relative;
+        }
+
+        .avatar-wrapper {
+            width: 160px; height: 160px;
+            margin-top: -130px;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 25px;
+        }
+        .avatar-img {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 6px solid #fff;
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .btn-edit-avatar {
+            width: 42px; height: 42px;
+            background: var(--login-grad);
+            color: white; border: 3px solid white; border-radius: 50%;
+            position: absolute; bottom: 5px; right: 5px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .bubbly-box {
+            background: #fff; border-radius: 30px; padding: 25px;
+            border: 1px solid #f1f5f9; height: 100%; transition: 0.3s ease;
+        }
+
+        .points-badge {
+            background: var(--login-grad);
+            color: white; padding: 10px 30px; border-radius: 50px;
+            font-weight: 800; display: inline-block; margin-bottom: 30px;
+        }
+
+        /* Innovation Styles */
+        .streak-badge {
+            background: #fff5f5; padding: 8px 20px; border-radius: 50px;
+            border: 2px solid #feb2b2; display: flex; align-items: center; gap: 8px;
+        }
+        .heatmap-grid {
+            display: grid; grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: repeat(7, 1fr); gap: 6px; width: max-content;
+        }
+        .heat-square { width: 14px; height: 14px; border-radius: 3px; background-color: #f1f5f9; }
+        .heat-1 { background-color: #c6e48b !important; } 
+        .heat-2 { background-color: #7bc96f !important; } 
+        .heat-3 { background-color: #239a3b !important; } 
+        .heat-4 { background-color: #196127 !important; }
+    </style>
+</head>
+<body>
+
+<header class="floating-nav">
+    <div class="text-white d-flex align-items-center">
+        <i class="bi bi-mortarboard-fill fs-3 me-2"></i>
+        <span class="fw-bold fs-4">Brain Trust</span>
+    </div>
+    <div class="d-flex align-items-center">
+        <a asp-controller="Question" asp-action="Index" class="btn btn-sm btn-outline-light rounded-pill px-4 fw-bold me-3">Dashboard</a>
+        <a asp-controller="Account" asp-action="Logout" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold">Logout</a>
+    </div>
+</header>
+
+<div class="container text-center">
+    <div class="profile-container">
+        <div class="avatar-wrapper">
+            @{ var avatarSeed = Context.Session.GetString("UserAvatar") ?? Model.UserName; }
+            <img id="profilePic" src="https://api.dicebear.com/7.x/avataaars/svg?seed=@avatarSeed" class="avatar-img">
+            <button class="btn btn-edit-avatar" data-bs-toggle="modal" data-bs-target="#avatarModal">
+                <i class="bi bi-pencil-fill small"></i>
+            </button>
+        </div>
+
+        <h1 class="fw-800 text-dark mb-1">@Model.UserName</h1>
+        <p class="text-muted fw-bold small text-uppercase mb-4">Master Scholar</p>
+
+        <div class="points-badge shadow-lg">
+            <i class="bi bi-trophy-fill me-2"></i> @Model.ScholarPoints SP
+        </div>
+
+        <div class="bubbly-box p-4 mb-5 text-start">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="fw-800 m-0 text-muted small text-uppercase"><i class="bi bi-calendar3-range me-2"></i>Learning Heatmap</h6>
+                <div class="streak-badge">
+                    <span>🔥</span> <span class="fw-800 small text-danger">@ViewBag.Streak DAY STREAK</span>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center overflow-auto">
+                <div id="heatmapGrid" class="heatmap-grid"></div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5 text-start">
+            <div class="col-md-6">
+                <div class="bubbly-box">
+                    <small class="fw-800 text-muted opacity-50 text-uppercase mb-3 d-block">Success Rate</small>
+                    <canvas id="barSolved" height="180"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="bubbly-box">
+                    <small class="fw-800 text-muted opacity-50 text-uppercase mb-3 d-block">Activity Trend</small>
+                    <canvas id="lineTime" height="180"></canvas>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="bubbly-box">
+                    <small class="fw-800 text-muted opacity-50 text-uppercase mb-3 d-block">Impact Mix</small>
+                    <canvas id="barPerformance" height="110"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="avatarModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0" style="border-radius: 40px; padding: 20px;">
+            <div class="modal-header border-0">
+                <h5 class="fw-800">Select Your Identity</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    @for (int i = 1; i <= 15; i++) {
+                        var style = "ScholarStyle" + i;
+                        <div class="col-4 col-md-2 text-center">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=@style" 
+                                 class="rounded-circle border p-1 img-fluid" style="cursor: pointer;" 
+                                 onclick="saveAvatar('@style')">
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // 1. Heatmap Logic
+    document.addEventListener("DOMContentLoaded", function() {
+        const heatmapData = @Html.Raw(ViewBag.HeatmapJson ?? "{}");
+        const grid = document.getElementById("heatmapGrid");
+        for (let i = 84; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toISOString().split('T')[0];
+            const square = document.createElement("div");
+            square.className = "heat-square";
+            if (heatmapData[dateStr]) {
+                const count = heatmapData[dateStr];
+                if (count >= 5) square.classList.add("heat-4");
+                else if (count >= 3) square.classList.add("heat-3");
+                else if (count >= 2) square.classList.add("heat-2");
+                else if (count >= 1) square.classList.add("heat-1");
+            }
+            grid.appendChild(square);
+        }
+    });
+
+    // 2. Charts Logic
+    Chart.defaults.font.family = "'Poppins', sans-serif";
+    Chart.defaults.color = "#94a3b8";
+
+    // Read server-provided JSON (falls back to demo data)
+    const barSolvedData = @Html.Raw(ViewBag.BarSolvedJson ?? System.Text.Json.JsonSerializer.Serialize(new int[] { Model.QuestionsCount, Model.AnswersCount }));
+    const activityLabels = @Html.Raw(ViewBag.ActivityLabelsJson ?? System.Text.Json.JsonSerializer.Serialize(new string[] { "M", "T", "W", "T", "F" }));
+    const activityData = @Html.Raw(ViewBag.ActivityDataJson ?? System.Text.Json.JsonSerializer.Serialize(new int[] { 10, 20, 5, 12, 8 }));
+    const perfData = @Html.Raw(ViewBag.BarPerformanceJson ?? System.Text.Json.JsonSerializer.Serialize(new int[] { Model.ScholarPoints / 10, Model.AnswersCount }));
+
+    // Bar: Asked vs Solved
+    const ctxBar = document.getElementById('barSolved').getContext('2d');
+    new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: ['Asked', 'Solved'],
+            datasets: [{
+                data: barSolvedData,
+                backgroundColor: ['#1e3c72', '#10b981'],
+                borderRadius: 15, barThickness: 45
+            }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+    });
+
+    // Line: Activity Trend (last 5 days)
+    const ctxLine = document.getElementById('lineTime').getContext('2d');
+    new Chart(ctxLine, {
+        type: 'line',
+        data: {
+            labels: activityLabels,
+            datasets: [{
+                data: activityData,
+                borderColor: '#702082', tension: 0.4, borderWidth: 3, fill: true, backgroundColor: 'rgba(112, 32, 130, 0.06)'
+            }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+    });
+
+    // Horizontal Bar: Impact Mix
+    const ctxPerf = document.getElementById('barPerformance').getContext('2d');
+    new Chart(ctxPerf, {
+        type: 'bar', indexAxis: 'y',
+        data: {
+            labels: ['Impact', 'Answers'],
+            datasets: [{
+                data: perfData,
+                backgroundColor: ['#f59e0b', '#6366f1'], borderRadius: 10, barThickness: 15
+            }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { display: false } } } }
+    });
+
+    function saveAvatar(seed) {
+        fetch('/Profile/UpdateAvatar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ avatarSeed: seed })
+        }).then(res => { if(res.ok) location.reload(); });
+    }
+</script>
+</body>
+</html>

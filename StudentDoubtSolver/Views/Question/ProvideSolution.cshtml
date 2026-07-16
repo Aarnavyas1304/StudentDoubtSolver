@@ -1,0 +1,208 @@
+﻿@model StudentDoubtSolver.Models.Question
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solve Doubt | Brain Trust</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --glass-white: rgba(255, 255, 255, 0.95);
+            --brand-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            --accent-glow: rgba(99, 102, 241, 0.15);
+        }
+
+        body { 
+            background: #f8fafc;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%);
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+        }
+
+        /* Fixed Proportional Card */
+        .solution-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(25px);
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 40px 100px -20px rgba(0,0,0,0.1);
+            width: 850px; 
+            max-width: 95vw;
+            padding: 50px;
+            position: relative;
+            animation: popIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Top Accent Line */
+        .solution-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 10px;
+            background: var(--brand-gradient);
+            border-radius: 40px 40px 0 0;
+        }
+
+        .question-tag {
+            background: #eef2ff; color: #6366f1; font-weight: 800; font-size: 0.7rem;
+            text-transform: uppercase; padding: 8px 18px; border-radius: 50px; letter-spacing: 1px;
+        }
+
+        .question-title { font-size: 2.4rem; font-weight: 800; color: #1e293b; margin-top: 15px; letter-spacing: -1px; }
+
+        /* Scrollable Solution Container */
+        .solution-list {
+            max-height: 300px; 
+            overflow-y: auto; 
+            padding-right: 10px;
+        }
+        .solution-list::-webkit-scrollbar { width: 6px; }
+        .solution-list::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+        /* Answer Bubble Styling */
+        .answer-bubble {
+            background: #ffffff;
+            border: 1px solid #f1f5f9;
+            border-radius: 24px;
+            padding: 20px 25px;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            position: relative;
+        }
+        .answer-bubble:hover {
+            transform: translateX(10px);
+            border-color: #6366f1;
+            box-shadow: 0 15px 30px var(--accent-glow);
+        }
+
+        /* Delete Button */
+        .delete-btn {
+            background: #fff1f2; color: #ef4444; border: none;
+            width: 40px; height: 40px; border-radius: 14px;
+            transition: 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .delete-btn:hover {
+            background: #ef4444; color: white;
+            transform: rotate(8deg) scale(1.1);
+        }
+
+        .fancy-textarea {
+            background: #f8fafc !important;
+            border: 2px solid #f1f5f9 !important;
+            border-radius: 24px !important;
+            padding: 25px !important;
+            resize: none;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .fancy-textarea:focus { 
+            border-color: #6366f1 !important; 
+            background: #fff !important; 
+            box-shadow: 0 0 0 4px var(--accent-glow) !important;
+        }
+
+        .btn-deploy {
+            background: var(--brand-gradient);
+            color: white; border-radius: 20px; padding: 16px 45px;
+            font-weight: 800; border: none; transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-deploy:hover { 
+            transform: scale(1.05) translateY(-2px); 
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4); 
+        }
+
+        @@keyframes popIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="solution-card">
+    <div class="mb-5">
+        <a asp-controller="Question" asp-action="Index" class="text-decoration-none text-muted small fw-bold">
+            <i class="bi bi-arrow-left-circle-fill me-2 fs-5 align-middle"></i> BACK TO DASHBOARD
+        </a>
+        <div class="mt-4">
+            <span class="question-tag"><i class="bi bi-hash me-1"></i> Doubt @Model.Id</span>
+            <h1 class="question-title">@Model.Title</h1>
+            <p class="text-secondary fs-5">@Model.Description</p>
+        </div>
+    </div>
+
+    <div class="mb-5">
+        <h5 class="fw-800 text-dark mb-4">
+            <i class="bi bi-chat-left-heart-fill text-primary me-2"></i> Community Solutions
+        </h5>
+        
+        <div class="solution-list">
+            @if (Model.Answers != null && Model.Answers.Any())
+            {
+                foreach (var ans in Model.Answers)
+                {
+                    <div class="answer-bubble d-flex justify-content-between align-items-center mb-3">
+                        <div class="pe-4">
+                            <p class="mb-0 text-dark fw-medium">@ans.Content</p>
+                            <small class="text-muted opacity-75">Verified Scholar Solution</small>
+                        </div>
+                        <form asp-action="DeleteAnswer" method="post" onsubmit="return confirm('Remove this solution permanently?');">
+                            <input type="hidden" name="id" value="@ans.Id" />
+                            <input type="hidden" name="questionId" value="@Model.Id" />
+                            <button type="submit" class="delete-btn shadow-sm">
+                                <i class="bi bi-trash3-fill"></i>
+                            </button>
+                        </form>
+                    </div>
+                }
+            }
+            else 
+            { 
+                <div class="text-center py-4 bg-light rounded-4 border border-dashed">
+                    <i class="bi bi-emoji-smile fs-2 text-muted"></i>
+                    <p class="text-muted small italic mb-0 mt-2">No answers yet. Your expertise is needed!</p> 
+                </div>
+            }
+        </div>
+    </div>
+
+    <hr class="opacity-25 mb-5">
+
+    <form asp-action="PostAnswer" method="post" class="d-flex flex-column">
+        <input type="hidden" name="QuestionId" value="@Model.Id" />
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <label class="fw-bold small text-dark opacity-50 text-uppercase tracking-wider">Your Contribution</label>
+            <span class="badge bg-soft-primary text-primary rounded-pill px-3">Expert Insight</span>
+        </div>
+
+        <textarea name="Content" class="form-control fancy-textarea mb-4" 
+                  rows="4" placeholder="Break down the solution step-by-step..." required></textarea>
+
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="text-muted small d-none d-md-block">
+                <i class="bi bi-shield-check text-success me-1"></i> Public Community Posting
+            </div>
+            <button type="submit" class="btn btn-deploy shadow-lg">
+                DEPLOY SOLUTION <i class="bi bi-magic ms-2"></i>
+            </button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
